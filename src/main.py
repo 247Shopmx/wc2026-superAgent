@@ -24,8 +24,8 @@ def main():
     
     # Flujo de trabajo principal
     try:
-        extractor = DataExtractor()
-        matches = extractor.get_upcoming_matches()
+        data_extractor = DataExtractor()
+        matches = data_extractor.get_upcoming_matches()
         if not matches:
             logger.warning("No matches found.")
             return
