@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "wc2026-superagent"
+version = "1.0.0"
+description = "Elite Quant Sports Trading Superagent for World Cup 2026"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy", "pandas", "scikit-learn", "xgboost", "lightgbm", 
+    "requests", "python-dotenv", "scipy"
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
