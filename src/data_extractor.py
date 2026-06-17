@@ -5,7 +5,7 @@ Handles secure data retrieval from All Sports API and The Odds API.
 import os
 import logging
 import requests
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from dotenv import load_dotenv
 
 load_dotenv()

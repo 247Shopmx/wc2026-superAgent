@@ -18,13 +18,13 @@ def main():
     logger.info("Starting WC2026 Superagent...")
     
     # Inicialización de componentes
-    extractor = DataExtractor()
     engineer = FeatureEngineer()
     trainer = EnsembleTrainer()
     bankroll_mgr = BankrollManager(bankroll=10000.0, kelly_fraction=0.25)
     
     # Flujo de trabajo principal
     try:
+        extractor = DataExtractor()
         matches = extractor.get_upcoming_matches()
         if not matches:
             logger.warning("No matches found.")

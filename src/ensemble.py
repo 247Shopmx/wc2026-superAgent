@@ -3,11 +3,11 @@ Ensemble Training Pipeline
 Manages the 6-model ensemble architecture.
 """
 import logging
+from typing import Dict
 import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.calibration import CalibratedClassifierCV
 import xgboost as xgb
 import lightgbm as lgb
 from src.models import DixonColesModel, MarkovChainModel
