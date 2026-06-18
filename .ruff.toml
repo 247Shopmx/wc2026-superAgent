@@ -1,7 +1,4 @@
 [lint]
-# Line length (consistent with pyproject.toml)
-line-length = 88
-
 # Select rules to enable
 select = [
     "E",      # pycodestyle errors
