@@ -5,39 +5,56 @@ Handles secure data retrieval from All Sports API and The Odds API.
 import os
 import logging
 import requests
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Optional
 from dotenv import load_dotenv
 
 load_dotenv()
 
 logger = logging.getLogger(__name__)
 
-ALL_SPORTS_API_KEY = os.getenv("ALL_SPORTS_API_KEY")
-THE_ODDS_API_KEY = os.getenv("THE_ODDS_API_KEY")
-
-if not ALL_SPORTS_API_KEY or not THE_ODDS_API_KEY:
-    raise EnvironmentError(
-        "Missing API keys. Ensure ALL_SPORTS_API_KEY and THE_ODDS_API_KEY are set in environment."
-    )
-
-ALL_SPORTS_BASE_URL = "https://apiv2.allsportsapi.com/football/"
-THE_ODDS_BASE_URL = "https://api.the-odds-api.com/v4/sports/"
-
 
 class DataExtractor:
     """Handles secure data retrieval from All Sports API and The Odds API."""
 
-    def __init__(self, timeout: int = 10):
+    def __init__(self, timeout: int = 10, api_keys: Optional[Dict[str, str]] = None):
+        """Initialize DataExtractor with optional API key injection for testing.
+        
+        Args:
+            timeout: Request timeout in seconds.
+            api_keys: Optional dict with 'all_sports_key' and 'odds_key' for testing.
+        """
         self.timeout = timeout
         self.session = requests.Session()
+        
+        # Allow API key injection for testing
+        if api_keys:
+            self.all_sports_api_key = api_keys.get('all_sports_key', '')
+            self.odds_api_key = api_keys.get('odds_key', '')
+        else:
+            self.all_sports_api_key = os.getenv("ALL_SPORTS_API_KEY", "")
+            self.odds_api_key = os.getenv("THE_ODDS_API_KEY", "")
+        
+        # Log warning if keys missing but don't crash (graceful degradation)
+        if not self.all_sports_api_key or not self.odds_api_key:
+            logger.warning(
+                "Missing API keys. Some features may not work. "
+                "Ensure ALL_SPORTS_API_KEY and THE_ODDS_API_KEY are set in environment."
+            )
+
+    ALL_SPORTS_BASE_URL = "https://apiv2.allsportsapi.com/football/"
+    THE_ODDS_BASE_URL = "https://api.the-odds-api.com/v4/sports/"
 
     def fetch_all_sports_data(self, method: str, params: Dict[str, Any]) -> Dict:
         """Fetch data from All Sports API with error handling."""
+        if not self.all_sports_api_key:
+            logger.error("All Sports API key not available")
+            return {}
+        
         try:
-            params["APIkey"] = ALL_SPORTS_API_KEY
+            params["APIkey"] = self.all_sports_api_key
             params["met"] = method
             response = self.session.get(
-                ALL_SPORTS_BASE_URL, params=params, timeout=self.timeout
+                self.ALL_SPORTS_BASE_URL, params=params, timeout=self.timeout
             )
             response.raise_for_status()
             data = response.json()
@@ -52,15 +69,21 @@ class DataExtractor:
             logger.error(f"All Sports API Parsing Error ({method}): {e}")
             return {}
 
-    def fetch_odds_data(self, sport_key: str, markets: List[str], regions: str = "us") -> List[Dict]:
+    def fetch_odds_data(
+        self, sport_key: str, markets: List[str], regions: str = "us"
+    ) -> List[Dict]:
         """Fetch odds from The Odds API."""
+        if not self.odds_api_key:
+            logger.error("Odds API key not available")
+            return []
+        
         try:
-            url = f"{THE_ODDS_BASE_URL}{sport_key}/odds"
+            url = f"{self.THE_ODDS_BASE_URL}{sport_key}/odds"
             params = {
-                "apiKey": THE_ODDS_API_KEY,
+                "apiKey": self.odds_api_key,
                 "regions": regions,
                 "markets": ",".join(markets),
-                "oddsFormat": "decimal"
+                "oddsFormat": "decimal",
             }
             response = self.session.get(url, params=params, timeout=self.timeout)
             response.raise_for_status()
@@ -74,4 +97,6 @@ class DataExtractor:
 
     def get_upcoming_matches(self) -> List[Dict]:
         """Get upcoming World Cup matches with odds."""
-        return self.fetch_odds_data("soccer_fifa_world_cup", ["h2h", "totals", "spreads"])
+        return self.fetch_odds_data(
+            "soccer_fifa_world_cup", ["h2h", "totals", "spreads"]
+        )
