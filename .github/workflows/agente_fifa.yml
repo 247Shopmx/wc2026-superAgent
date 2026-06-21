@@ -1,0 +1,19 @@
+name: FIFA 2026 Superagent Scheduler
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with: {python-version: '3.12'}
+      - run: pip install pandas numpy xgboost catboost tensorflow requests pytz scikit-learn
+      - name: Run logic
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: | 
+          echo 'Ejecutando Agente Mundial: Verificando horario CDMX...'
