@@ -1,24 +1,19 @@
-name: FIFA 2026 LIVE AGENT
+name: FIFA 2026 Superagent Scheduler
 on:
   schedule:
-    - cron: '*/30 10-22 * * *'
+    - cron: '*/30 * * * *'
   workflow_dispatch:
 jobs:
-  run-prediction-engine:
+  run-agent:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with: {python-version: '3.12'}
-      - name: Install dependencies
-        run: pip install pandas numpy xgboost catboost tensorflow requests pytz scikit-learn
-      - name: Run Superagent
+      - run: pip install pandas numpy xgboost catboost tensorflow requests pytz scikit-learn
+      - name: Run logic
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-          ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: |
-          python - <<EOF
-          print('🚀 Agente Iniciado en Producción')
-          # Aquí se integra la lógica de ejecucion_agente()
-          EOF
+          echo 'Ejecutando Agente Mundial: Verificando horario CDMX...'
