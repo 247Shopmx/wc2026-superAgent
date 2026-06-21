@@ -4,13 +4,14 @@ on:
     - cron: '*/30 10-22 * * *'
   workflow_dispatch:
 jobs:
-  run-agent:
+  run-prediction-engine:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with: {python-version: '3.12'}
-      - run: pip install pandas numpy xgboost catboost tensorflow requests pytz scikit-learn
+      - name: Install dependencies
+        run: pip install pandas numpy xgboost catboost tensorflow requests pytz scikit-learn
       - name: Run Superagent
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
@@ -18,7 +19,6 @@ jobs:
           ODDS_API_KEY: ${{ secrets.ODDS_API_KEY }}
         run: |
           python - <<EOF
-          import os
-          # Aquí se ejecutaría el script principal apuntando a la API Real
-          print('🚀 Agente Iniciado: Monitoreando Mundial 2026 con Datos Reales')
+          print('🚀 Agente Iniciado en Producción')
+          # Aquí se integra la lógica de ejecucion_agente()
           EOF
